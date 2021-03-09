@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<link rel="stylesheet" type="text/css" href="z.css">
+
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+
+<!-- jQuery library -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<!-- Latest compiled JavaScript -->
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+
+</head>
+<body>
+<div class="jumbotron jumbotron-billboard text-center">
+	<div class="img"></div>
+	<div class="container pt">
+		<div class="text-center">
+			<img class="logo" src='https://cdn4.vectorstock.com/i/1000x1000/97/98/indian-cuisine-restaurant-india-food-dishes-vector-28149798.jpg' />
+		</div>
+		<div class="mt-5 text-color">
+			<h1>Find the best Restaurants</h1>
+		</div>
+		<div class="row mx-auto well col-lg-12 mt-5">
+			<div class="col-xs-4 pr-0">
+				<select id="select_id" class="form-control form-control-lg">
+					<option value="Select City" hidden>Select City</option>
+					<option value="4">Bengaluru</option>
+					<option value="3" >Mumbai</option>
+					<option value="1">Delhi</option>
+					<option value="6">Hyderabad</option>
+					<option value="5">Pune</option>
+				</select>
+			</div>
+			<div class="col-xs-6 pl-0 pr-0">
+				<input id="getText" type="text" class="form-control" placeholder="Search for Restaurant">
+				</div>
+				<button id = "getMessage" class = "btn btn-success col-xs-2">Search</button>
+			</div>
+		</div>
+	</div>
+	<div class="container">
+		<div>
+			<div class = "message col-md-12"></div>
+		</div>
+	</div>
+	<hr>
+		
+
+</body>
+<script >
+	
+	$(document).ready(function() {
+
+ $("#getMessage").on("click", function() {
+  var valueSearchBox = $('#getText').val()
+  if (valueSearchBox === "") {
+   return;
+  }
+  select();
+ });
+ //--------------------------------------------------SEARCH BY CITY-----------------------------------------
+
+ function select() {
+  var valueDropdown = $('#select_id').val();
+  var valueSearchBox = $('#getText').val();
+  var searchCity = "&q=" + valueSearchBox;
+  var settings = {
+   "async": true,
+   "crossDomain": true,
+   "url": "https://developers.zomato.com/api/v2.1/search?entity_id=" + valueDropdown + "&entity_type=city" + searchCity + "&count=100",
+   "method": "GET",
+   "headers": {
+    "user-key": "5c4c8dfd07a8f36f01ed13288205f278s",
+    'Content-Type': 'application/x-www-form-urlencoded'
+   }
+  };
+
+  $.getJSON(settings, function(data) {
+
+   data = data.restaurants;
+   var html = "";
+
+   $.each(data, function(index, value) {
+
+    var x = data[index];
+     console.log(typeof x);
+    $.each(x, function(index, value) {
+     var location = x.restaurant.location;
+     var userRating = x.restaurant.user_rating;
+     html += "<div class='data img-rounded'>";
+     html += "<div class='rating'>";
+
+     html += "<span title='" + userRating.rating_text + "'><p style='color:white;background-color:#" + userRating.rating_color + ";border-radius:4px;border:none;padding:2px 10px 2px 10px;text-align: center;text-decoration:none;display:inline-block;font-size:16px;float:right;'><strong>" + userRating.aggregate_rating + "</strong></p></span><br>";
+     html += "  <strong class='text-info'>" + userRating.votes + " votes</strong>";
+     html += "</div>";
+     html += "<img class='resimg img-rounded' src=" + value.thumb + " alt='Restaurant Image' height='185' width='185'>";
+     html += "<a href=" + value.url + " target='_blank' class='action_link'><h2 style='color:red;'><strong>" + value.name + "</strong></h2></a>";
+     html += "  <strong class='text-primary'>" + location.locality + "</strong><br>";
+     html += "  <h6 style='color:grey;'><strong>" + location.address + "</strong></h6><hr>";
+     html += "  <strong>CUISINES</strong>: " + value.cuisines + "<br>";
+     html += "  <strong>COST FOR TWO</strong>: " + value.currency + value.average_cost_for_two + "<br>";
+     html += "</div><br>";
+    });
+   });
+   $(".message").html(html);
+  });
+
+ }
+ //--------------------------------------------------------------------------------------------------------
+ $("#select_id").change(function() {
+  select();
+ });
+});
+
+</script></html>
